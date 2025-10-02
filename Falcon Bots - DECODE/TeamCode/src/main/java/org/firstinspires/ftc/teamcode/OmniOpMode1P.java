@@ -15,6 +15,12 @@ public class OmniOpMode1P extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
+    private DcMotor beltLaunchRight = null;
+    private DcMotor beltLaunchLeft = null;
+
+    private DcMotor intake = null;
+    private DcMotor sorter = null;
+
     @Override
     public void runOpMode() {
 
@@ -25,6 +31,11 @@ public class OmniOpMode1P extends LinearOpMode {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
 
+        beltLaunchRight = hardwareMap.get(DcMotor.class, "belt_launch_right");
+        beltLaunchLeft = hardwareMap.get(DcMotor.class, "belt_launch_left");
+
+        intake = hardwareMap.get(DcMotor.class, "scoop");
+        sorter = hardwareMap.get(DcMotor.class, "sorter");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -50,6 +61,8 @@ public class OmniOpMode1P extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+
+            //WHEELS//
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -98,6 +111,44 @@ public class OmniOpMode1P extends LinearOpMode {
             rightBackDrive.setPower(rightBackPower);
 
 
+            //LAUNCHER/BELT GUN//
+            if (gamepad1.x) {
+                beltLaunchLeft.setPower(.6);
+                beltLaunchRight.setPower(-.6);
+                telemetry.addData("Launcher", "shoot");
+            }
+
+            else {
+                telemetry.addData("Launcher", "idle");
+
+                beltLaunchLeft.setPower(0);
+                beltLaunchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                beltLaunchRight.setPower(0);
+                beltLaunchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
+
+            //SORTER//
+            if (gamepad1.dpad_right) {
+                sorter.setPower(.3);
+                telemetry.addData("Sorter", "spinning right");
+            }
+
+            else if (gamepad1.dpad_left) {
+                sorter.setPower(-.3);
+                telemetry.addData("Sorter", "spinning left");
+            }
+
+            else {
+                telemetry.addData("Sorter", "idle");
+                sorter.setPower(0);
+                sorter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
+
+            //INTAKE//
+
+
+            //TELEMETRY//
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
